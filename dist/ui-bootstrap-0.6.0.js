@@ -1221,7 +1221,7 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         scope.position = $position.position(element);
         scope.position.top = scope.position.top + element.prop('offsetHeight');
 
-        var padding = 2; //min distance away from right side
+        var padding = 20; //min distance away from right side
         var width = $(popupEl).outerWidth(true);
         var widthOver =  $('body').outerWidth(true) - (scope.position.left + width + padding);
 
