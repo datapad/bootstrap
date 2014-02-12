@@ -1221,6 +1221,14 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
       function updatePosition() {
         scope.position = $position.position(element);
         scope.position.top = scope.position.top + element.prop('offsetHeight');
+
+        var padding = 2; //min distance away from right side
+        var width = $(popupEl).outerWidth(true);
+        var widthOver =  $('body').outerWidth(true) - (scope.position.left + width + padding);
+
+        if(widthOver < 0) {
+          scope.position.left = scope.position.left + widthOver;
+        }
       }
 
       var documentBindingInitialized = false, elementFocusInitialized = false;
@@ -3464,11 +3472,6 @@ angular.module("template/progressbar/bar.html", []).run(["$templateCache", funct
 angular.module("template/progressbar/progress.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/progressbar/progress.html",
     "<div class=\"progress\"><progressbar ng-repeat=\"bar in bars\" width=\"bar.to\" old=\"bar.from\" animate=\"bar.animate\" type=\"bar.type\"></progressbar></div>");
-}]);
-
-angular.module("template/progressbar/progressbar.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("template/progressbar/progressbar.html",
-    "<div class=\"progress\"><div class=\"progress-bar\" ng-class=\"type && 'progress-bar-' + type\" ng-transclude></div></div>");
 }]);
 
 angular.module("template/rating/rating.html", []).run(["$templateCache", function($templateCache) {
