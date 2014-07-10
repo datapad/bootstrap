@@ -263,8 +263,9 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
     require: 'ngModel',
     link: function(originalScope, element, attrs, ngModel) {
 
-      var closeOnDateSelection = angular.isDefined(attrs.closeOnDateSelection) ? scope.$eval(attrs.closeOnDateSelection) : datepickerPopupConfig.closeOnDateSelection;
+      var closeOnDateSelection = angular.isDefined(attrs.closeOnDateSelection) ? originalScope.$eval(attrs.closeOnDateSelection) : datepickerPopupConfig.closeOnDateSelection;
       var dateFormat = attrs.datepickerPopup || datepickerPopupConfig.dateFormat;
+      var positionFixed = angular.isDefined(attrs.popupFixed) ? originalScope.$eval(attrs.popupFixed) : false;
 
      // create a child scope for the datepicker directive so we are not polluting original scope
       var scope = originalScope.$new();
@@ -311,6 +312,9 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         'ng-model': 'date',
         'ng-change': 'dateSelection()'
       });
+      if (positionFixed) {
+        popupEl.css('position', 'fixed');
+      }
       var datepickerEl = popupEl.find('datepicker');
       if (attrs.datepickerOptions) {
         datepickerEl.attr(angular.extend({}, originalScope.$eval(attrs.datepickerOptions)));
@@ -390,17 +394,23 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
       }
 
       function updatePosition() {
-        scope.position = $position.position(element);
-        scope.position.top = scope.position.top + element.prop('offsetHeight');
+        var offset = $position.offset(element);
+        var popupWidth = $(popupEl).outerWidth(true);
+        var pageWidth = $('body').outerWidth(true);
+        var leftMax = offset.left + popupWidth;
+        var widthOver = leftMax - pageWidth;
 
-        var padding = 0; //min distance away from right side
-        var width = $(popupEl).outerWidth(true);
-        var actual = scope.position.left + element.prop('offsetWidth') + width + padding;
-        var widthOver =  $('body').outerWidth(true) - actual;
-
-        if(widthOver < 0) {
-          scope.position.left = scope.position.left + widthOver;
+        if (positionFixed) {
+          scope.position = offset;
+        } else {
+          scope.position = $position.position(element);
         }
+
+        if (widthOver > 0) {
+          scope.position.left = scope.position.left - widthOver;
+        }
+
+        scope.position.top = scope.position.top + element.prop('offsetHeight');
       }
 
       var documentBindingInitialized = false, elementFocusInitialized = false;
